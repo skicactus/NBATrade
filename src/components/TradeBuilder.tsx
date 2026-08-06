@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Player, Team } from "../types/player";
 import { evaluateTrade } from "../engine/evaluateTrade";
+import { TradeFlowGraph } from "./TradeFlowGraph";
 
 function formatSalary(salary: number): string {
   const sign = salary < 0 ? "-" : "";
@@ -81,11 +82,11 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
     setSelectedB(new Set());
   }
 
-  const result = useMemo(() => {
-    if (!teamA || !teamB || selectedA.size === 0 || selectedB.size === 0) return null;
+  const sendingA = useMemo(() => rosterA.filter((p) => selectedA.has(p.id)), [rosterA, selectedA]);
+  const sendingB = useMemo(() => rosterB.filter((p) => selectedB.has(p.id)), [rosterB, selectedB]);
 
-    const sendingA = rosterA.filter((p) => selectedA.has(p.id));
-    const sendingB = rosterB.filter((p) => selectedB.has(p.id));
+  const result = useMemo(() => {
+    if (!teamA || !teamB || sendingA.length === 0 || sendingB.length === 0) return null;
 
     return evaluateTrade({
       sides: [
@@ -93,7 +94,7 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
         { teamId: teamB.id, sending: sendingB, currentRoster: rosterB },
       ],
     });
-  }, [teamA, teamB, rosterA, rosterB, selectedA, selectedB]);
+  }, [teamA, teamB, rosterA, rosterB, sendingA, sendingB]);
 
   return (
     <div className="trade-builder">
@@ -124,23 +125,26 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
         </div>
       </div>
 
-      {result && (
-        <div className={`trade-result ${result.legal ? "legal" : "illegal"}`}>
-          <p className="trade-result-summary">{result.summary}</p>
-          <div className="trade-result-teams">
-            {result.teams.map((t) => (
-              <div key={t.teamId} className="trade-result-team">
-                <strong>{t.teamId}</strong>
-                <span>Sends {formatSalary(t.outgoingSalary)}</span>
-                <span>Receives {formatSalary(t.incomingSalary)}</span>
-                <span>Net value {formatSalary(t.netValue)}</span>
-                <span className={t.capCheck.legal ? "cap-ok" : "cap-bad"}>
-                  {t.capCheck.legal ? "Cap OK" : "Cap violation"}
-                </span>
-              </div>
-            ))}
+      {result && teamA && teamB && (
+        <>
+          <div className={`trade-result ${result.legal ? "legal" : "illegal"}`}>
+            <p className="trade-result-summary">{result.summary}</p>
+            <div className="trade-result-teams">
+              {result.teams.map((t) => (
+                <div key={t.teamId} className="trade-result-team">
+                  <strong>{t.teamId}</strong>
+                  <span>Sends {formatSalary(t.outgoingSalary)}</span>
+                  <span>Receives {formatSalary(t.incomingSalary)}</span>
+                  <span>Net value {formatSalary(t.netValue)}</span>
+                  <span className={t.capCheck.legal ? "cap-ok" : "cap-bad"}>
+                    {t.capCheck.legal ? "Cap OK" : "Cap violation"}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+          <TradeFlowGraph teamA={teamA} teamB={teamB} sendingA={sendingA} sendingB={sendingB} evaluation={result} />
+        </>
       )}
     </div>
   );
