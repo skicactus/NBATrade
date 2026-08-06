@@ -6,6 +6,15 @@ visualizes proposed trades as a graph of teams and players.
 
 Stack: Vite + React + TypeScript, LLM tool-calling, React Flow.
 
+## Demo
+
+[`docs/demo.webm`](docs/demo.webm) — Rosters → Trade Builder (proposes
+Doncic-for-Tatum, checks it against real 2026-27 cap rules, renders it as
+a graph) → the AI GM chat tab. Recorded against a build with no
+`ANTHROPIC_API_KEY` configured, so it stops short of a live model
+response — worth re-recording that last leg once deployed with a real
+key.
+
 ## Status
 
 Running on the real 2026-27 NBA season — 529 players across all 30 teams,
@@ -119,4 +128,18 @@ flowchart LR
 - Day 4: trade finder — search + rank legal packages from a plain-English request — done
 - Day 5: React Flow trade visualizer — done
 - Day 6: error handling, edge cases, architecture docs — done
-- Day 7: final deploy + demo
+- Day 7: real 2026-27 league data (529 players, 30 teams), demo recording — done; production deploy is a one-time manual step (see below)
+
+## Deploying
+
+This repo is ready to deploy as-is — `vercel.json` already sets the API
+route's timeout, and the build is a standard Vite app plus one
+serverless function. From [vercel.com/new](https://vercel.com/new):
+
+1. Import `skicactus/NBATrade`, branch `claude/ai-gm-trade-desk-day1-y9lzbc` (or `main` once merged).
+2. Leave the framework preset on auto-detected Vite — no build settings to change.
+3. In the project's **Environment Variables**, add `ANTHROPIC_API_KEY` with your key.
+4. Deploy. Every subsequent push to the branch redeploys automatically.
+
+I don't have Vercel credentials in this environment, so this step needs
+you.
