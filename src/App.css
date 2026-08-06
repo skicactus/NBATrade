@@ -1,0 +1,92 @@
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.team-selector {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.team-roster {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.team-roster-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.team-roster-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.team-cap-total {
+  color: #666;
+  font-weight: 600;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.player-card-main {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.player-name {
+  font-weight: 600;
+}
+
+.player-position {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.player-card-stats {
+  display: flex;
+  gap: 0.9rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.empty-roster {
+  color: #999;
+  font-style: italic;
+}
