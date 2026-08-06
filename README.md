@@ -8,9 +8,11 @@ Stack: Vite + React + TypeScript, LLM tool-calling, React Flow.
 
 ## Status
 
-Day 6: hardened edge cases (can't select the same team on both sides of a
-trade, typed API error messages for auth/rate-limit/network failures,
-Claude refusals and empty replies handled gracefully) and wrote up the
+Running on the real 2026-27 NBA season — 529 players across all 30 teams,
+real salaries and contract lengths, real salary cap/apron figures. Day 6
+hardened edge cases (can't select the same team on both sides of a trade,
+typed API error messages for auth/rate-limit/network failures, Claude
+refusals and empty replies handled gracefully) and wrote up the
 architecture below. Day 5 added a React Flow trade visualizer — the
 manual Trade Builder renders every proposed trade as a graph (teams and
 players as nodes, edges showing who moves where), color-coded green/red
@@ -20,6 +22,28 @@ naming a specific player; the agent searches every other team's roster
 for legal, ranked packages. The LLM never computes cap legality or value
 itself — it only calls `get_roster` / `evaluate_trade` /
 `find_trade_targets` and explains the results.
+
+## Data
+
+`src/data/players.ts` is real, not a fixture — 529 players, all 30 teams,
+researched from Wikipedia's per-team "2026-27 season" roster pages
+(position, birth date) and HoopsHype's season salary tables (2026-27
+salary, contract length). League-wide cap figures in
+`src/engine/constants.ts` are the NBA's official 2026-27 numbers.
+
+Two things worth knowing:
+
+- **`overall` is not a real stat.** There's no official single-number
+  rating for an NBA player, so it's a simple 40-99 tier (superstar /
+  All-Star / starter / rotation / bench) assigned by basketball
+  judgment, the same way an NBA2K-style rating would be — documented so
+  it doesn't read as more precise than it is.
+- **A handful of players have estimated salaries** where a contract was
+  still unresolved as of the data pull (restricted free agents,
+  unsigned draft picks) or the player wasn't in the salary source at all
+  (deep two-way/exhibit-10 players). These are a small minority of the
+  529 and don't affect the demo's behavior, but if you're citing a
+  specific number, spot-check it.
 
 ## Development
 
