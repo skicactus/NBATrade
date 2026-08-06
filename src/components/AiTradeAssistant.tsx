@@ -58,8 +58,21 @@ export function AiTradeAssistant() {
     }
   }
 
+  function newChat() {
+    setMessages([]);
+    setInput("");
+    setError(null);
+  }
+
   return (
     <div className="ai-assistant">
+      {messages.length > 0 && (
+        <div className="ai-assistant-header">
+          <button type="button" className="ai-new-chat" onClick={newChat}>
+            New chat
+          </button>
+        </div>
+      )}
       <div className="ai-assistant-messages">
         {messages.length === 0 && (
           <p className="ai-assistant-hint">
@@ -94,6 +107,7 @@ export function AiTradeAssistant() {
           onKeyDown={handleKeyDown}
           placeholder="Describe a trade or ask a question..."
           rows={2}
+          disabled={loading}
         />
         <button type="button" onClick={sendMessage} disabled={loading || !input.trim()}>
           Send

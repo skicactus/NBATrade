@@ -49,6 +49,22 @@ function textFromContent(content: Anthropic.ContentBlock[]): string {
     .trim();
 }
 
+export function friendlyApiError(err: unknown): Error {
+  if (err instanceof Anthropic.AuthenticationError) {
+    return new Error("The server's ANTHROPIC_API_KEY was rejected. Check that it's set and valid.");
+  }
+  if (err instanceof Anthropic.RateLimitError) {
+    return new Error("Rate limited by the Anthropic API — try again in a moment.");
+  }
+  if (err instanceof Anthropic.APIConnectionError) {
+    return new Error("Couldn't reach the Anthropic API. Check your network connection and try again.");
+  }
+  if (err instanceof Anthropic.APIError) {
+    return new Error(`Anthropic API error (${err.status ?? "unknown"}): ${err.message}`);
+  }
+  return err instanceof Error ? err : new Error("Unknown error calling the Anthropic API.");
+}
+
 export async function handleChat(history: ChatTurn[]): Promise<ChatResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -65,16 +81,32 @@ export async function handleChat(history: ChatTurn[]): Promise<ChatResult> {
   const toolCalls: ToolCallTrace[] = [];
 
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 2048,
-      system: SYSTEM_PROMPT,
-      tools: toolDefinitions,
-      messages,
-    });
+    let response: Anthropic.Message;
+    try {
+      response = await client.messages.create({
+        model: MODEL,
+        max_tokens: 2048,
+        system: SYSTEM_PROMPT,
+        tools: toolDefinitions,
+        messages,
+      });
+    } catch (err) {
+      throw friendlyApiError(err);
+    }
+
+    if (response.stop_reason === "refusal") {
+      return {
+        reply: "I can't help with that request. Try rephrasing it as a basketball trade question.",
+        toolCalls,
+      };
+    }
 
     if (response.stop_reason !== "tool_use") {
-      return { reply: textFromContent(response.content), toolCalls };
+      const reply = textFromContent(response.content);
+      return {
+        reply: reply || "I didn't get a text response — try rephrasing your request.",
+        toolCalls,
+      };
     }
 
     messages.push({ role: "assistant", content: response.content });
@@ -92,5 +124,7 @@ export async function handleChat(history: ChatTurn[]): Promise<ChatResult> {
     messages.push({ role: "user", content: toolResults });
   }
 
-  throw new Error("Exceeded maximum tool-call iterations without a final answer.");
+  throw new Error(
+    "The AI GM got stuck gathering information without reaching an answer. Try a simpler or more specific request.",
+  );
 }

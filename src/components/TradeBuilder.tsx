@@ -86,7 +86,7 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
   const sendingB = useMemo(() => rosterB.filter((p) => selectedB.has(p.id)), [rosterB, selectedB]);
 
   const result = useMemo(() => {
-    if (!teamA || !teamB || sendingA.length === 0 || sendingB.length === 0) return null;
+    if (!teamA || !teamB || teamA.id === teamB.id || sendingA.length === 0 || sendingB.length === 0) return null;
 
     return evaluateTrade({
       sides: [
@@ -102,7 +102,7 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
         <div>
           <select value={teamAId} onChange={(e) => selectTeamA(e.target.value)}>
             {teams.map((t) => (
-              <option key={t.id} value={t.id}>
+              <option key={t.id} value={t.id} disabled={t.id === teamBId}>
                 {t.city} {t.name}
               </option>
             ))}
@@ -114,7 +114,7 @@ export function TradeBuilder({ teams, players }: TradeBuilderProps) {
         <div>
           <select value={teamBId} onChange={(e) => selectTeamB(e.target.value)}>
             {teams.map((t) => (
-              <option key={t.id} value={t.id}>
+              <option key={t.id} value={t.id} disabled={t.id === teamAId}>
                 {t.city} {t.name}
               </option>
             ))}
