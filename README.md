@@ -8,9 +8,12 @@ Stack: Vite + React + TypeScript, LLM tool-calling, React Flow.
 
 ## Status
 
-Day 3: deterministic trade engine wired up to a Claude tool-calling loop —
-the LLM never computes cap legality or value itself, only calls
-`get_roster` / `evaluate_trade` and explains the result.
+Day 4: the trade finder — describe a need in plain English ("I need a
+starting PG, I can give up wings") and the agent searches every other
+team's roster for legal, ranked packages instead of you naming a specific
+player. The LLM never computes cap legality or value itself; it only
+calls `get_roster` / `evaluate_trade` / `find_trade_targets` and explains
+the results.
 
 ## Development
 
@@ -29,7 +32,7 @@ the API key never reaches the browser.
 
 - Day 2: deterministic player value model + cap-match validator (`evaluate_trade`) — done
 - Day 3: LLM tool-calling loop (trade evaluation + explanation) — done
-- Day 4: trade finder — search + rank legal packages from a plain-English request
+- Day 4: trade finder — search + rank legal packages from a plain-English request — done
 - Day 5: React Flow trade visualizer
 - Day 6: error handling, edge cases, architecture docs
 - Day 7: final deploy + demo

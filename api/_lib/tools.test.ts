@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runGetRoster, runEvaluateTrade } from "./tools";
+import { runGetRoster, runEvaluateTrade, runFindTradeTargets } from "./tools";
 
 describe("runGetRoster", () => {
   it("returns the roster for a known team", () => {
@@ -46,5 +46,22 @@ describe("runEvaluateTrade", () => {
 
     expect(result.error).toBeDefined();
     expect(result.missingA).toEqual(["not-a-real-id"]);
+  });
+});
+
+describe("runFindTradeTargets", () => {
+  it("returns candidates with resolved team and player names", () => {
+    const result = JSON.parse(runFindTradeTargets({ myTeamId: "SAS" }));
+    expect(result.myTeam).toBe("San Antonio Spurs");
+    expect(Array.isArray(result.candidates)).toBe(true);
+    for (const candidate of result.candidates) {
+      expect(candidate.partnerTeam).not.toBe(candidate.partnerTeamId);
+      expect(typeof candidate.legal).toBe("boolean");
+    }
+  });
+
+  it("returns an error for an unknown team", () => {
+    const result = JSON.parse(runFindTradeTargets({ myTeamId: "XXX" }));
+    expect(result.error).toBeDefined();
   });
 });

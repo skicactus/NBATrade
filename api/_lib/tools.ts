@@ -2,7 +2,10 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { teams } from "../../src/data/teams";
 import { players } from "../../src/data/players";
 import { evaluateTrade } from "../../src/engine/evaluateTrade";
-import type { Player } from "../../src/types/player";
+import { findTradeTargets, type FindTradesRequest } from "../../src/engine/findTrades";
+import type { Player, Position } from "../../src/types/player";
+
+const POSITIONS: Position[] = ["PG", "SG", "SF", "PF", "C"];
 
 export const toolDefinitions: Anthropic.Tool[] = [
   {
@@ -41,6 +44,42 @@ export const toolDefinitions: Anthropic.Tool[] = [
         },
       },
       required: ["teamAId", "teamASendingPlayerIds", "teamBId", "teamBSendingPlayerIds"],
+    },
+  },
+  {
+    name: "find_trade_targets",
+    description:
+      "Search every other team's roster for legal, mutually-beneficial trade packages that get the user's team a player at a given position. Use this when the user describes what they need in general terms (e.g. \"I need a starting PG\") rather than naming a specific target player — it's much better than guessing a single trade yourself. Returns already cap-checked, value-ranked candidates.",
+    input_schema: {
+      type: "object",
+      properties: {
+        myTeamId: { type: "string", description: "Abbreviation of the user's team." },
+        targetPosition: {
+          type: "string",
+          enum: POSITIONS,
+          description: "Position the user wants to acquire. Omit to search all positions.",
+        },
+        eligibleSendingPositions: {
+          type: "array",
+          items: { type: "string", enum: POSITIONS },
+          description:
+            'Restrict which of the user\'s own players are available to trade, by position (e.g. ["SF","SG"] if the user says they\'ll give up wings). Omit to consider the whole roster.',
+        },
+        excludePlayerIds: {
+          type: "array",
+          items: { type: "string" },
+          description: "Player ids (from get_roster) on the user's team who are untouchable.",
+        },
+        maxPackageSize: {
+          type: "integer",
+          description: "Max number of the user's players to package together in one trade. Default 2.",
+        },
+        limit: {
+          type: "integer",
+          description: "How many ranked candidate trades to return. Default 3.",
+        },
+      },
+      required: ["myTeamId"],
     },
   },
 ];
@@ -104,6 +143,38 @@ export function runEvaluateTrade(input: {
   });
 }
 
+function playerName(id: string): string {
+  return players.find((p) => p.id === id)?.name ?? id;
+}
+
+function teamName(id: string): string {
+  const team = teams.find((t) => t.id === id);
+  return team ? `${team.city} ${team.name}` : id;
+}
+
+export function runFindTradeTargets(input: FindTradesRequest): string {
+  const team = teams.find((t) => t.id === input.myTeamId);
+  if (!team) {
+    return JSON.stringify({ error: `Unknown teamId "${input.myTeamId}".` });
+  }
+
+  const candidates = findTradeTargets(input, players);
+
+  return JSON.stringify({
+    myTeam: teamName(input.myTeamId),
+    candidates: candidates.map((c) => ({
+      partnerTeam: teamName(c.partnerTeamId),
+      partnerTeamId: c.partnerTeamId,
+      youSend: c.sendingPlayerIds.map(playerName),
+      youReceive: playerName(c.receivingPlayerId),
+      legal: c.evaluation.legal,
+      yourNetValue: c.evaluation.teams[0].netValue,
+      partnerNetValue: c.evaluation.teams[1].netValue,
+      summary: c.evaluation.summary,
+    })),
+  });
+}
+
 export function runTool(name: string, input: unknown): string {
   switch (name) {
     case "get_roster":
@@ -117,6 +188,8 @@ export function runTool(name: string, input: unknown): string {
           teamBSendingPlayerIds: string[];
         },
       );
+    case "find_trade_targets":
+      return runFindTradeTargets(input as FindTradesRequest);
     default:
       return JSON.stringify({ error: `Unknown tool "${name}".` });
   }
