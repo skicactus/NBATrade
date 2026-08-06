@@ -8,12 +8,17 @@ Stack: Vite + React + TypeScript, LLM tool-calling, React Flow.
 
 ## Demo
 
-[`docs/demo.webm`](docs/demo.webm) — Rosters → Trade Builder (proposes
-Doncic-for-Tatum, checks it against real 2026-27 cap rules, renders it as
-a graph) → the AI GM chat tab. Recorded against a build with no
-`ANTHROPIC_API_KEY` configured, so it stops short of a live model
-response — worth re-recording that last leg once deployed with a real
-key.
+![Demo](docs/demo.gif)
+
+Rosters → Trade Builder (checks a trade against real 2026-27 cap rules,
+renders it as a graph) → the AI GM tab. This environment has no
+`ANTHROPIC_API_KEY`, so neither recording shows a live model call: the
+GIF above mocks the `/api/chat` response to show what a
+`find_trade_targets` result looks like rendered as a `TradeFlowGraph`
+(clearly a stand-in, not a real exchange); the higher-quality
+[`docs/demo.webm`](docs/demo.webm) stops before submitting rather than
+show a fake response. Worth re-recording both once deployed with a real
+key, so the AI GM segment is an actual model response.
 
 ## Status
 
