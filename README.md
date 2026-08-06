@@ -29,8 +29,10 @@ by cap legality. The trade finder (Day 4) lets you describe a need in
 plain English ("I need a starting PG, I can give up wings") instead of
 naming a specific player; the agent searches every other team's roster
 for legal, ranked packages. The LLM never computes cap legality or value
-itself — it only calls `get_roster` / `evaluate_trade` /
-`find_trade_targets` and explains the results.
+itself — it only calls `get_roster` / `check_cap_validity` /
+`evaluate_trade` / `find_trade_targets` and explains the results.
+`find_trade_targets` results render as `TradeFlowGraph`s directly in the
+chat, not just text.
 
 ## Data
 
@@ -95,7 +97,7 @@ flowchart LR
     end
 
     subgraph Server["Server (api/) — Vercel function / Vite dev middleware"]
-        TOOLS["tools.ts<br/>get_roster · evaluate_trade · find_trade_targets"]
+        TOOLS["tools.ts<br/>get_roster · check_cap_validity · evaluate_trade · find_trade_targets"]
         LOOP["chatHandler.ts<br/>tool-calling loop"]
     end
 
@@ -117,7 +119,8 @@ flowchart LR
 **Layers, inside out:**
 
 - **`src/engine/`** — pure functions, no I/O, no framework dependency. `playerValue` models surplus value (market value vs. actual salary, discounted per remaining contract year, adjusted for age); `checkSalaryMatch` implements the real NBA salary-matching bands by apron status; `evaluateTrade` combines both for a specific proposed trade; `findTrades` runs the combinatorial search behind the trade finder. Fully covered by `vitest` — these are the functions a resume bullet points at.
-- **`api/_lib/tools.ts`** — wraps the engine as three LLM tool definitions + executors. This is the only place that translates between "player ids the model reasons about" and "Player objects the engine operates on."
+- **`api/_lib/tools.ts`** — wraps the engine as four LLM tool definitions + executors (`get_roster`, `check_cap_validity`, `evaluate_trade`, `find_trade_targets`). This is the only place that translates between "player ids the model reasons about" and "Player objects the engine operates on." `check_cap_validity` and `evaluate_trade` both run the same underlying `checkSalaryMatch` — the former for a single team's isolated cap math, the latter for a full two-sided trade plus value.
+- **`src/lib/visualizeToolCall.ts`** — re-derives graph-ready data (full `Team`/`Player` objects, a complete `TradeEvaluation`) from a tool call's own input by re-running the same deterministic engine client-side, so `evaluate_trade` and `find_trade_targets` results render as `TradeFlowGraph`s in the chat, not just JSON.
 - **`api/_lib/chatHandler.ts`** — the agentic loop: call Claude with the tools, execute whatever it requests locally, feed results back, repeat until it has a final answer (capped at 6 iterations). Runs identically in two places — `api/chat.ts` (Vercel serverless function in production) and a Vite dev-server middleware (`vite.config.ts`) for local development — so the Anthropic API key is never sent to the browser in either environment.
 - **`src/components/`** — the React UI. The Trade Builder calls `evaluateTrade` directly (no LLM needed for a fully-specified trade); the AI GM chat talks to `/api/chat`; `TradeFlowGraph` renders any evaluated trade as a graph regardless of which path produced it.
 

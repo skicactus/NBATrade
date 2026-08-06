@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { TradeFlowGraph } from "./TradeFlowGraph";
+import { visualizeToolCall } from "../lib/visualizeToolCall";
 
 interface ToolCallTrace {
   name: string;
@@ -80,23 +82,43 @@ export function AiTradeAssistant() {
             the Lakers for a guard?"
           </p>
         )}
-        {messages.map((m, i) => (
-          <div key={i} className={`ai-message ai-message-${m.role}`}>
-            <div className="ai-message-role">{m.role === "user" ? "You" : "AI GM"}</div>
-            <div className="ai-message-text">{m.content}</div>
-            {m.toolCalls && m.toolCalls.length > 0 && (
-              <details className="ai-tool-trace">
-                <summary>{m.toolCalls.length} tool call(s)</summary>
-                {m.toolCalls.map((tc, j) => (
-                  <div key={j} className="ai-tool-call">
-                    <code>{tc.name}({JSON.stringify(tc.input)})</code>
-                    <pre>{tc.result}</pre>
-                  </div>
-                ))}
-              </details>
-            )}
-          </div>
-        ))}
+        {messages.map((m, i) => {
+          const visualizations = (m.toolCalls ?? []).flatMap((tc) => visualizeToolCall(tc.name, tc.input));
+          return (
+            <div key={i} className={`ai-message ai-message-${m.role}`}>
+              <div className="ai-message-role">{m.role === "user" ? "You" : "AI GM"}</div>
+              <div className="ai-message-text">{m.content}</div>
+              {visualizations.length > 0 && (
+                <div className="ai-message-graphs">
+                  {visualizations.map((v) => (
+                    <div key={v.key}>
+                      {v.label && <p className="ai-graph-label">{v.label}</p>}
+                      <TradeFlowGraph
+                        teamA={v.teamA}
+                        teamB={v.teamB}
+                        sendingA={v.sendingA}
+                        sendingB={v.sendingB}
+                        evaluation={v.evaluation}
+                        height={280}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {m.toolCalls && m.toolCalls.length > 0 && (
+                <details className="ai-tool-trace">
+                  <summary>{m.toolCalls.length} tool call(s)</summary>
+                  {m.toolCalls.map((tc, j) => (
+                    <div key={j} className="ai-tool-call">
+                      <code>{tc.name}({JSON.stringify(tc.input)})</code>
+                      <pre>{tc.result}</pre>
+                    </div>
+                  ))}
+                </details>
+              )}
+            </div>
+          );
+        })}
         {loading && <p className="ai-assistant-hint">Thinking…</p>}
         {error && <p className="ai-assistant-error">{error}</p>}
       </div>

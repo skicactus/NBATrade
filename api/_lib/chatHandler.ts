@@ -13,9 +13,10 @@ const SYSTEM_PROMPT = `You are the AI GM for an NBA trade desk app. You help a u
 Teams (id: full name):
 ${TEAM_LIST}
 
-You have three tools:
+You have four tools:
 - get_roster: look up a team's current players and their ids, ratings, salaries, and contracts.
-- evaluate_trade: deterministically check whether a specific proposed trade is salary-cap legal and which team gains more value.
+- check_cap_validity: check the salary-matching legality of what ONE team sends vs. takes back, given its current payroll. Use this only for a narrow cap-math question about a single team in isolation ("could the Bulls absorb this much salary?") — not for evaluating a full trade.
+- evaluate_trade: deterministically check whether a specific proposed two-team trade is salary-cap legal and which team gains more value. This is the default tool for "is this trade legal / who wins" questions — it already runs the same cap check as check_cap_validity for both sides.
 - find_trade_targets: search every other team's roster for legal, ranked trade packages that fill a need (e.g. a position), instead of the user having to name a specific target player.
 
 Rules:

@@ -242,6 +242,20 @@
   white-space: pre-wrap;
 }
 
+.ai-message-graphs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.ai-graph-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+  margin: 0 0 0.35rem;
+}
+
 .ai-tool-trace {
   margin-top: 0.5rem;
   font-size: 0.8rem;

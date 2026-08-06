@@ -60,6 +60,8 @@ interface TradeFlowGraphProps {
   sendingA: Player[];
   sendingB: Player[];
   evaluation: TradeEvaluation;
+  /** Wrapper height in px. Defaults to 420 (full-size, used by the Trade Builder). */
+  height?: number;
 }
 
 const TEAM_A_X = 40;
@@ -67,7 +69,7 @@ const TEAM_B_X = 780;
 const PLAYER_X = 410;
 const ROW_HEIGHT = 90;
 
-export function TradeFlowGraph({ teamA, teamB, sendingA, sendingB, evaluation }: TradeFlowGraphProps) {
+export function TradeFlowGraph({ teamA, teamB, sendingA, sendingB, evaluation, height = 420 }: TradeFlowGraphProps) {
   const legalA = evaluation.teams[0].capCheck.legal;
   const legalB = evaluation.teams[1].capCheck.legal;
 
@@ -157,7 +159,7 @@ export function TradeFlowGraph({ teamA, teamB, sendingA, sendingB, evaluation }:
   }, [teamA, teamB, sendingA, sendingB, evaluation, legalA, legalB]);
 
   return (
-    <div className="trade-flow-graph">
+    <div className="trade-flow-graph" style={{ height }}>
       <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView proOptions={{ hideAttribution: true }}>
         <Background />
       </ReactFlow>
