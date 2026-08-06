@@ -4,9 +4,10 @@ import { players } from "./data/players";
 import { TeamSelector } from "./components/TeamSelector";
 import { TeamRoster } from "./components/TeamRoster";
 import { TradeBuilder } from "./components/TradeBuilder";
+import { AiTradeAssistant } from "./components/AiTradeAssistant";
 import "./App.css";
 
-type View = "rosters" | "trade-builder";
+type View = "rosters" | "trade-builder" | "ai-assistant";
 
 function App() {
   const [view, setView] = useState<View>("rosters");
@@ -41,6 +42,13 @@ function App() {
           >
             Trade Builder
           </button>
+          <button
+            type="button"
+            className={view === "ai-assistant" ? "active" : ""}
+            onClick={() => setView("ai-assistant")}
+          >
+            AI GM
+          </button>
         </nav>
       </header>
       <main>
@@ -51,6 +59,7 @@ function App() {
           </>
         )}
         {view === "trade-builder" && <TradeBuilder teams={teams} players={players} />}
+        {view === "ai-assistant" && <AiTradeAssistant />}
       </main>
     </div>
   );
