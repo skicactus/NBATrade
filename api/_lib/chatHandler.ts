@@ -4,7 +4,12 @@ import type { Team } from "../../src/types/player";
 import { toolDefinitions, runTool } from "./tools";
 
 const MODEL = "claude-opus-5";
-const MAX_TOOL_ITERATIONS = 6;
+// Kept low relative to Vercel's 60s function timeout (vercel.json) — each
+// iteration is a full round trip to Claude, and most real trade questions
+// resolve in 1-3 tool calls. A higher cap risks the function getting killed
+// by Vercel's infra timeout mid-loop, which returns an HTML error page
+// instead of JSON and surfaces as a confusing parse error in the UI.
+const MAX_TOOL_ITERATIONS = 4;
 
 const TEAM_LIST = teams.map((t: Team) => `${t.id}: ${t.city} ${t.name}`).join("\n");
 

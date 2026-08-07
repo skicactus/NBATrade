@@ -39,12 +39,22 @@ export function AiTradeAssistant() {
         }),
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data: { reply?: string; toolCalls?: ToolCallTrace[]; error?: string };
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error(
+          res.status >= 500
+            ? "The server hit an error or took too long to respond. Try a simpler question, or try again in a moment."
+            : `Unexpected response from the server (status ${res.status}). Try again.`,
+        );
+      }
       if (!res.ok) throw new Error(data.error ?? "Request failed");
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.reply, toolCalls: data.toolCalls },
+        { role: "assistant", content: data.reply ?? "", toolCalls: data.toolCalls },
       ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
