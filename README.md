@@ -49,11 +49,20 @@ salary, contract length). League-wide cap figures in
 
 Two things worth knowing:
 
-- **`overall` is not a real stat.** There's no official single-number
-  rating for an NBA player, so it's a simple 40-99 tier (superstar /
-  All-Star / starter / rotation / bench) assigned by basketball
-  judgment, the same way an NBA2K-style rating would be — documented so
-  it doesn't read as more precise than it is.
+- **`overall` is computed from real 2025-26 per-game stats** (points,
+  rebounds, assists, steals, blocks, shooting splits — the most recently
+  completed season), via a documented formula in
+  [`scripts/compute-overall-ratings.mjs`](scripts/compute-overall-ratings.mjs),
+  not hand-assigned. It's still not an official stat — no such thing
+  exists — but it's reproducible and traceable to real numbers rather
+  than a judgment call. The one exception: players with fewer than 15
+  games played in 2025-26 (rookies, draft-and-stash, injury-shortened
+  seasons) have no real sample to compute from, so they keep a
+  subjective tier estimate instead — a documented, bounded minority of
+  the 529. The formula itself is intentionally simple (a demo
+  methodology, not a scouting model) and has known biases — e.g. it can
+  overvalue low-volume, high-efficiency bigs relative to high-usage
+  wings having an off shooting year.
 - **A handful of players have estimated salaries** where a contract was
   still unresolved as of the data pull (restricted free agents,
   unsigned draft picks) or the player wasn't in the salary source at all
