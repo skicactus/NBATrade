@@ -12,7 +12,7 @@ export const players: Player[] = [
   { id: "onyeka-okongwu-atl", name: "Onyeka Okongwu", teamId: "ATL", position: "C", age: 25, overall: 78, salary: 16120000, contractYearsLeft: 2 },
   { id: "cj-mccollum-atl", name: "CJ McCollum", teamId: "ATL", position: "SG", age: 34, overall: 75, salary: 21000000, contractYearsLeft: 1 },
   { id: "luguentz-dort-atl", name: "Luguentz Dort", teamId: "ATL", position: "SG", age: 27, overall: 72, salary: 17222222, contractYearsLeft: 1 },
-  { id: "nickeil-alexander-walker-atl", name: "Nickeil Alexander-Walker", teamId: "ATL", position: "SG", age: 27, overall: 66, salary: 14403710, contractYearsLeft: 3 },
+  { id: "nickeil-alexander-walker-atl", name: "Nickeil Alexander-Walker", teamId: "ATL", position: "SG", age: 27, overall: 81, salary: 14403710, contractYearsLeft: 3 },
   { id: "buddy-hield-atl", name: "Buddy Hield", teamId: "ATL", position: "SG", age: 33, overall: 65, salary: 9658536, contractYearsLeft: 2 },
   { id: "corey-kispert-atl", name: "Corey Kispert", teamId: "ATL", position: "SF", age: 27, overall: 64, salary: 13975000, contractYearsLeft: 3 },
   { id: "aaron-wiggins-atl", name: "Aaron Wiggins", teamId: "ATL", position: "SF", age: 27, overall: 63, salary: 9028038, contractYearsLeft: 3 },
