@@ -55,11 +55,12 @@ Two things worth knowing:
   [`scripts/compute-overall-ratings.mjs`](scripts/compute-overall-ratings.mjs),
   not hand-assigned. It's still not an official stat — no such thing
   exists — but it's reproducible and traceable to real numbers rather
-  than a judgment call. The one exception: players with fewer than 15
+  than a judgment call. The one exception: players with fewer than 25
   games played in 2025-26 (rookies, draft-and-stash, injury-shortened
-  seasons) have no real sample to compute from, so they keep a
-  subjective tier estimate instead — a documented, bounded minority of
-  the 529. The formula itself is intentionally simple (a demo
+  seasons — e.g. Jayson Tatum's 16-game sample recovering from an
+  Achilles tear) have no reliable real sample to compute from, so they
+  keep a subjective tier estimate instead — a documented, bounded
+  minority of the 529. The formula itself is intentionally simple (a demo
   methodology, not a scouting model) and has known biases — e.g. it can
   overvalue low-volume, high-efficiency bigs relative to high-usage
   wings having an off shooting year.

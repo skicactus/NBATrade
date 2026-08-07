@@ -14,14 +14,20 @@
 // A player needs at least MIN_GP games played in the source season to get
 // a stat-derived rating; below that (rookies, draft-and-stash, injury-outs)
 // their existing `overall` value in players.ts is left untouched, since
-// there's no real in-season sample to compute from.
+// there's no real in-season sample to compute from. 25 was chosen after
+// 15 proved too low in practice: Jayson Tatum's 16-game sample (a stretch
+// recovering from an Achilles tear, shooting a career-worst 41.1% FG)
+// computed a lower rating than his actual caliber warrants. 25+ games
+// still includes plenty of injury-shortened-but-real star seasons
+// (Giannis at 36 games, Embiid at 38) while filtering out the noisiest,
+// most likely injury-contaminated small samples.
 //
 // This was originally run against 2025-26 season stats (researched from
 // each team's "2025–26 [Team] season" Wikipedia article) to replace the
 // subjective tier ratings the initial 2026-27 dataset shipped with.
 import { readFileSync, writeFileSync } from "node:fs";
 
-const MIN_GP = 15;
+const MIN_GP = 25;
 const PLAYERS_FILE = new URL("../src/data/players.ts", import.meta.url);
 
 const statsFiles = process.argv.slice(2);
